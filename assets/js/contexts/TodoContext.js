@@ -6,52 +6,65 @@ class TodoContextProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        todos: [{
-            name: 'Giani'
-        }],
+      todos: [
+        {
+          id: 1,
+          name: "Giani",
+        },
+        {
+          id: 2,
+          name: "Marius",
+        },
+      ],
     };
   }
 
   // create
 
-  createTodo(event, todo){
+  createTodo(event, todo) {
     event.preventDefault();
     let data = [...this.state.todos];
     data.push(todo);
     this.setState({
-      todos:data,
-    })
+      todos: data,
+    });
   }
 
   // read
 
-  readTodo(){
-
-  }
+  readTodo() {}
 
   // update
 
-  updateTodo(){
+  updateTodo(data) {
+    let todos = [...this.state.todos];
+    let todo = todos.find(todo => {
+      return todo.id === data.id;
+    });
 
+    todo.name = data.name;
+
+    this.setState({
+      todos:todos
+    })
   }
 
   //delete
 
-  deleteTodo(){
-
-  }
-
+  deleteTodo() {}
 
   render() {
     return (
-        <TodoContext.Provider value={{
-            ...this.state,
-            createTodo: this.createTodo.bind(this),
-            updateTodo: this.updateTodo.bind(this),
-            deleteTodo: this.deleteTodo.bind(this)
-        }}>
-            {this.props.children}
-        </TodoContext.Provider>
+      <TodoContext.Provider
+        value={{
+          ...this.state,
+          createTodo: this.createTodo.bind(this),
+          updateTodo: this.updateTodo.bind(this),
+          deleteTodo: this.deleteTodo.bind(this),
+        }}
+      >
+        {this.props.children}
+      </TodoContext.Provider>
     );
   }
 }
