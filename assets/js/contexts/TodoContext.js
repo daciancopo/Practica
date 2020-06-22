@@ -1,22 +1,17 @@
 import React, { Component, createContext } from "react";
+import axios from "axios";
 
 export const TodoContext = createContext();
+
+const url = "/api/todo";
 
 class TodoContextProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos: [
-        {
-          id: 1,
-          name: "Giani",
-        },
-        {
-          id: 2,
-          name: "Marius",
-        },
-      ],
+      todos: [],
     };
+    this.readTodo();
   }
 
   // create
@@ -32,36 +27,45 @@ class TodoContextProvider extends Component {
 
   // read
 
-  readTodo() {}
+  readTodo() {
+    axios
+      .get('/api/todo/read')
+      .then((response) => {
+        this.setState({todos:response.data})
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   // update
 
   updateTodo(data) {
     let todos = [...this.state.todos];
-    let todo = todos.find(todo => {
+    let todo = todos.find((todo) => {
       return todo.id === data.id;
     });
 
     todo.name = data.name;
 
     this.setState({
-      todos:todos
-    })
+      todos: todos,
+    });
   }
 
   //delete
 
   deleteTodo(data) {
     let todos = [...this.state.todos];
-    let todo = todos.find(todo => {
+    let todo = todos.find((todo) => {
       return todo.id === data.id;
     });
 
     todos.splice(todos.indexOf(todo), 1);
 
     this.setState({
-      todos:todos
-    })
+      todos: todos,
+    });
   }
 
   render() {
