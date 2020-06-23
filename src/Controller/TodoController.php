@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Todo;
+use App\Form\TodoType;
 use App\Repository\TodoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -49,20 +50,38 @@ class TodoController extends AbstractController
     {
         $content = json_decode($request->getContent());
 
+
+        $form = $this->createForm(TodoType::class);
+        $form->submit((array)$content);
+
+        if(!$form->isValid()){
+            $errors = [];
+            foreach($form->getErrors(true, true) as $error){
+                $propertyName = $error->getOrigin()->getName();
+                $errors[$propertyName] = $error->getMessage();
+            }
+
+            return $this->json([
+                'message' => ['text' => implode("\n", $errors), 'level' => 'warning']
+            ]);
+        }
+
+
         $todo = new Todo();
 
         $todo->setName($content->name);
+        $todo->setDescription($content->description);
+
 
         try {
             $this->entityManager->persist($todo);
             $this->entityManager->flush();
-          
         } catch (Exception $exception) {
             return $this->json([
-                'message' => ['text' => ['Problem ocured!', 'To-Do dosen`t reach the database.'], 'level' => 'error']
+                'message' => ['text' => 'Problem ocured! To-Do dosen`t reach the database.', 'level' => 'error']
             ]);
         }
-        
+
         return $this->json([
             'todo' => $todo->toArray(),
             'message' => ['text' => 'To-Do has been created!', 'level' => 'success']
@@ -79,7 +98,14 @@ class TodoController extends AbstractController
     {
         $content = json_decode($request->getContent());
 
+        if ($todo->getName() === $content->name && $todo->getDescription() === $content->description) {
+            return $this->json([
+                'message' => ['text' => 'Nothing to change!', 'level' => 'warning']
+            ]);
+        }
+
         $todo->setName($content->name);
+        $todo->setDescription($content->description);
 
         try {
             $this->entityManager->flush();
@@ -90,6 +116,7 @@ class TodoController extends AbstractController
         }
 
         return $this->json([
+            'todo' => $todo->toArray(),
             'message' => ['text' => 'To-Do successfully updated!', 'level' => 'success'],
         ]);
     }

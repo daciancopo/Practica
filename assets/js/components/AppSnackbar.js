@@ -10,31 +10,35 @@ function checkLevel(level) {
     case "error":
       return "red";
 
+    case "warning":
+      return "orange";
+
     default:
-      return "orage";
+      return "white";
   }
 }
 
 export default function AppSnackbar() {
   const context = useContext(TodoContext);
+  const handleClose = () => {
+    context.setMessage({});
+  };
   return (
     <div>
       <Snackbar
-        autoHideDuration={100}
+        onClose={handleClose}
+        autoHideDuration={6000}
         open={context.message.text !== undefined}
       >
         {context.message.text && (
           <SnackbarContent
-            style={{ backgroundColor: checkLevel(context.message.level) }}
+            style={{
+              backgroundColor: checkLevel(context.message.level),
+              whiteSpace: "pre",
+            }}
             message={context.message.text}
             action={[
-              <Button
-                onClick={() => {
-                  context.setMessage({});
-                }}
-                key="dismiss"
-                color="inherit"
-              >
+              <Button onClick={handleClose} key="dismiss" color="inherit">
                 dismiss
               </Button>,
             ]}

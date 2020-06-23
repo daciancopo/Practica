@@ -14,13 +14,16 @@ import {
   TableBody,
   IconButton,
   TextField,
+  Typography,
 } from "@material-ui/core";
 
 export default function TodoTable() {
   const context = useContext(TodoContext);
-  const [addTodo, setAddTodo] = useState("");
+  const [addTodoName, setAddTodoName] = useState("");
+  const [addTodoDescription, setAddTodoDescription] = useState("");
   const [editIsShown, setEditIsShown] = useState(false);
-  const [editTodo, setEditTodo] = useState("");
+  const [editTodoName, setEditTodoName] = useState("");
+  const [editTodoDescription, setEditTodoDescription] = useState("");
   const [deleteConfirmationIsShown, setDeleteConfirmationIsShown] = useState(
     false
   );
@@ -28,13 +31,21 @@ export default function TodoTable() {
 
   const onCreateSubmit = (event) => {
     event.preventDefault();
-    context.createTodo(event, { name: addTodo });
-    setAddTodo("");
+    context.createTodo(event, {
+      name: addTodoName,
+      description: addTodoDescription,
+    });
+    setAddTodoName("");
+    setAddTodoDescription("");
   };
 
   const onUpdateSubmit = (todoId, event) => {
     event.preventDefault();
-    context.updateTodo({ id: todoId, name: editTodo });
+    context.updateTodo({
+      id: todoId,
+      name: editTodoName,
+      description: editTodoDescription,
+    });
     setEditIsShown(false);
   };
 
@@ -44,6 +55,7 @@ export default function TodoTable() {
         <TableHead>
           <TableRow>
             <TableCell>Task</TableCell>
+            <TableCell>Description</TableCell>
             <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -52,13 +64,29 @@ export default function TodoTable() {
             <TableCell>
               <form onSubmit={onCreateSubmit}>
                 <TextField
+                  required
                   type="text"
-                  value={addTodo}
+                  value={addTodoName}
                   onChange={(event) => {
-                    setAddTodo(event.target.value);
+                    setAddTodoName(event.target.value);
                   }}
                   label="New Task"
-                  fullWidth={true}
+                  fullWidth
+                />
+              </form>
+            </TableCell>
+            <TableCell>
+              <form>
+                <TextField
+                  required
+                  type="text"
+                  value={addTodoDescription}
+                  onChange={(event) => {
+                    setAddTodoDescription(event.target.value);
+                  }}
+                  label="Task Description"
+                  fullWidth
+                  multiline
                 />
               </form>
             </TableCell>
@@ -78,24 +106,40 @@ export default function TodoTable() {
                     <form onSubmit={onUpdateSubmit.bind(this, todo.id)}>
                       <TextField
                         type="text"
-                        fullWidth={true}
-                        autoFocus={true}
-                        value={editTodo}
+                        fullWidth
+                        autoFocus
+                        value={editTodoName}
                         onChange={(event) => {
-                          setEditTodo(event.target.value);
+                          setEditTodoName(event.target.value);
                         }}
                       />
                     </form>
                   ) : (
-                    todo.name
+                  <Typography>{todo.name}</Typography>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editIsShown === todo.id ? (
+                    <form onSubmit={onUpdateSubmit.bind(this, todo.id)}>
+                      <TextField
+                        type="text"
+                        multiline
+                        fullWidth
+                        autoFocus
+                        value={editTodoDescription}
+                        onChange={(event) => {
+                          setEditTodoDescription(event.target.value);
+                        }}
+                      />
+                    </form>
+                  ) : (
+                    <Typography style={{whiteSpace: 'pre-wrap'}}>{todo.description}</Typography>
                   )}
                 </TableCell>
                 <TableCell align="right">
                   {editIsShown === todo.id ? (
                     <Fragment>
-                      <IconButton
-                        onClick={onUpdateSubmit.bind(this, todo.id)}
-                      >
+                      <IconButton onClick={onUpdateSubmit.bind(this, todo.id)}>
                         <DoneIcon style={{ color: "green" }} />
                       </IconButton>
                       <IconButton
@@ -111,7 +155,8 @@ export default function TodoTable() {
                       <IconButton
                         onClick={() => {
                           setEditIsShown(todo.id);
-                          setEditTodo(todo.name);
+                          setEditTodoName(todo.name);
+                          setEditTodoDescription(todo.description);
                         }}
                       >
                         <EditIcon />
