@@ -56,12 +56,17 @@ class TodoController extends AbstractController
         try {
             $this->entityManager->persist($todo);
             $this->entityManager->flush();
-            return $this->json([
-                'todo' => $todo->toArray(),
-            ]);
+          
         } catch (Exception $exception) {
-            //error
+            return $this->json([
+                'message' => ['text' => ['Problem ocured!', 'To-Do dosen`t reach the database.'], 'level' => 'error']
+            ]);
         }
+        
+        return $this->json([
+            'todo' => $todo->toArray(),
+            'message' => ['text' => 'To-Do has been created!', 'level' => 'success']
+        ]);
     }
 
     /**
@@ -79,11 +84,13 @@ class TodoController extends AbstractController
         try {
             $this->entityManager->flush();
         } catch (Exception $exception) {
-            //error
+            return $this->json([
+                'message' => ['text' => 'Failed to edit!', 'level' => 'error']
+            ]);
         }
 
         return $this->json([
-            'message' => 'todo has been updated',
+            'message' => ['text' => 'To-Do successfully updated!', 'level' => 'success'],
         ]);
     }
 
@@ -98,11 +105,13 @@ class TodoController extends AbstractController
             $this->entityManager->remove($todo);
             $this->entityManager->flush();
         } catch (Exception $exception) {
-            //error
+            return $this->json([
+                'message' => ['text' => 'Failed to delete!', 'level' => 'error']
+            ]);
         }
 
         return $this->json([
-            'message' => 'todo has been deleted',
+            'message' => ['text' => 'To-Do has successfully been deleted!', 'level' => 'success'],
         ]);
     }
 }
