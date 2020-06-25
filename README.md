@@ -1,1 +1,1 @@
-# Practica
+# Practica Symfony 5 & ReactJS
